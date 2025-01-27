@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roleta de Sorteio</title>
+    <style>
+        .wheel-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 50px;
+        }
+
+        .pointer {
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid red;
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translate(-50%, 0);
+        }
+
+        .center-circle {
+            width: 80px;
+            height: 80px;
+            background-color: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .button-container {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        #resultado {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+
+        .start-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Roleta de Sorteio</h1>
+    <p id="resultado">Clique no botão para sortear um nome</p>
+
+    <div class="wheel-container">
+        <canvas id="canvas" width="500" height="500"></canvas>
+        <div class="pointer"></div>
+    </div>
+
+    <div class="button-container">
+        <button class="start-button" onclick="girar()">Clique Aqui</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        const largura = canvas.width;
+        const altura = canvas.height;
+        const centroX = largura / 2;
+        const centroY = altura / 2;
+        const raio = largura / 2;
+
+        //array com os nomes pode colocar mais nomes aqui
+        let nomes = ['ana',"jose", "maria", 'bruno','pedro','josé','alice'];
+        let passo = 360 / nomes.length;
+        let grausAtuais = 0;
+        let angulosItens = {};
+        let alvoRotacao = 0;
+
+        function desenharRoleta() {
+            let anguloInicial = 0;
+            nomes.forEach((nome, index) => {
+                const anguloFinal = anguloInicial + passo;
+                const cor = `hsl(${index * (360 / nomes.length)}, 80%, 60%)`;
+
+                ctx.beginPath();
+                ctx.moveTo(centroX, centroY);
+                ctx.arc(centroX, centroY, raio, paraRadianos(anguloInicial), paraRadianos(anguloFinal));
+                ctx.fillStyle = cor;
+                ctx.fill();
+
+                ctx.save();
+                ctx.translate(centroX, centroY);
+                ctx.rotate(paraRadianos((anguloInicial + anguloFinal) / 2));
+                ctx.textAlign = "right";
+                ctx.fillStyle = "#fff";
+                ctx.font = "16px Arial";
+                ctx.fillText(nome, raio - 20, 10);
+                ctx.restore();
+
+                angulosItens[nome] = { inicio: anguloInicial, fim: anguloFinal };
+                anguloInicial = anguloFinal;
+            });
+        }
+
+        function girar() {
+            //pegar a logica do numero sorteado para receber o indice do array
+            const indiceAleatorio = Math.floor(Math.random() * nomes.length);
+            console.log(indiceAleatorio)
+            const nomeEscolhido = nomes[indiceAleatorio];
+            const meioSetor = (angulosItens[nomeEscolhido].inicio + angulosItens[nomeEscolhido].fim) / 2;
+
+            const voltasCompletas = 360 * 5;
+            const deslocamento = -90;
+            alvoRotacao = voltasCompletas + deslocamento - meioSetor;
+
+            animarRoleta(nomeEscolhido);
+            
+        }
+
+        function animarRoleta(nomeEscolhido) {
+            const duracaoAnimacao = 4000;
+            const taxaQuadros = 60;
+            const totalQuadros = (duracaoAnimacao / 1000) * taxaQuadros;
+            let quadro = 0;
+            const grausIniciais = grausAtuais;
+
+            function animar() {
+                quadro++;
+                const progresso = Math.min(quadro / totalQuadros, 1);
+                const progressoSuavizado = Math.sin((progresso * Math.PI) / 2);
+                const rotacaoAtual = grausIniciais + (alvoRotacao - grausIniciais) * progressoSuavizado;
+
+                ctx.clearRect(0, 0, largura, altura);
+                ctx.save();
+                ctx.translate(centroX, centroY);
+                ctx.rotate(paraRadianos(rotacaoAtual));
+                ctx.translate(-centroX, -centroY);
+                desenharRoleta();
+                ctx.restore();
+
+                if (quadro < totalQuadros) {
+                    requestAnimationFrame(animar);
+                } else {
+                    grausAtuais = alvoRotacao % 360;
+                    document.getElementById("resultado").innerText = `Nome sorteado: ${nomeEscolhido}`;
+                }
+            }
+
+            animar();
+        }
+
+        function paraRadianos(graus) {
+            return graus * (Math.PI / 180);
+        }
+
+        desenharRoleta();
+    </script>
+</body>
+</html>
