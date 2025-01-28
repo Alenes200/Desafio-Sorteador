@@ -18,7 +18,7 @@
   <section id="form">
     <input type="text" id="input-names" placeholder="Digite nomes separados por vírgula">
     <button id="add">Adicionar</button>
-    <button id="draw">Sortear</button>
+    <button id="girar" class="start-button">Sortear</button>
     <button id="reset">Resetar</button>
     <p id="validation-message" style="display: none; color: red;">Por favor, insira ao menos um nome ou número.</p>
 
@@ -30,21 +30,21 @@
   <!-- Exibição do vencedor -->
   <section id="result">
     <h2>Vencedor:</h2>
-    <div id="winner-highlight">Nenhum sorteio realizado ainda.</div>
+    <p id="resultado">Nenhum sorteio realizado ainda.</p>
   </section>
 
   <!-- Estrutura da roleta -->
   <section id="roulette">
-    <div class="roulette-container">
-      <!-- Nomes/números girarão aqui -->
-    </div>
+    <div class="wheel-container">
+      <canvas id="canvas" width="500" height="500"></canvas>
+      <div class="pointer"></div>
   </section>
 
   <!-- Histórico (Opcional) -->
   <section id="history">
     <h2>Histórico de Sorteios</h2>
     <ul id="history-list"></ul>
-    <script src="index.js" type="module"></script>
+    <script src="main.js" type="module"></script>
   </section>
 </body>
 
