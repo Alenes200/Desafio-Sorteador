@@ -1,6 +1,6 @@
-import { dispararEvento } from "./custom-event.js";
-import { paraRadianos, desenharRoleta, girar, animarRoleta } from './roulette.js';
-import { fisherYatesShuffle } from './draw.js';
+import { dispararEvento } from "../custom-event.js";
+import { paraRadianos, desenharRoleta, girar, animarRoleta } from '../utils/roulette.js'
+import { fisherYatesShuffle } from '../utils/draw.js';
 
 export function RoulettePage() {
   const div = document.createElement('div');
@@ -12,11 +12,6 @@ export function RoulettePage() {
     <button id="girar" class="start-button">Sortear</button>
     <button id="reset">Resetar</button>
     <p id="validation-message" style="display: none; color: red;">Por favor, insira ao menos um nome ou número.</p>
-
-    <!-- Área para exibir os nomes adicionados -->
-    <h3>Nomes Adicionados:</h3>
-    <ul id="added-names-list"></ul>
-    </section>
 
     <!-- Exibição do vencedor -->
     <section id="result">
@@ -50,8 +45,11 @@ export function RoulettePage() {
   const centroY = altura / 2;
   const raio = largura / 2;
 
+
+
   let grausAtuais = 0;
-  let namesArray = [];
+
+  let namesArray = JSON.parse(localStorage.getItem("names")) || [];
   let angulosItens = desenharRoleta(ctx, namesArray, largura, altura, centroX, centroY, raio);
 
   addButton.addEventListener("click", function () {
@@ -77,13 +75,22 @@ export function RoulettePage() {
   div.querySelector("#girar").addEventListener("click", async () => {
     const nomeEscolhido = fisherYatesShuffle(namesArray);
     const { alvoRotacao } = girar(nomeEscolhido, angulosItens);
+
     const resultado = await animarRoleta(
-      ctx, namesArray, angulosItens,
-      largura, altura, centroX, centroY,
+      ctx, namesArray, angulosItens, largura, altura, centroX, centroY,
       grausAtuais, alvoRotacao, nomeEscolhido
     );
 
     grausAtuais = resultado.novoGrausAtuais;
+
+    // Remover nome sorteado da lista e salvar no localStorage
+    namesArray = namesArray.filter(nome => nome !== resultado.nomeEscolhido);
+    localStorage.setItem("names", JSON.stringify(namesArray));
+
+    // Atualizar ângulos da roleta sem "teleporte"
+    angulosItens = desenharRoleta(ctx, namesArray, largura, altura, centroX, centroY, raio);
+
+    // Exibir resultado
     div.querySelector("#resultado").innerText = `Nome sorteado: ${resultado.nomeEscolhido}`;
   });
 
