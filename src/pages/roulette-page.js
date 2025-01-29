@@ -6,73 +6,82 @@ export function RoulettePage() {
   const div = document.createElement('div');
 
   div.innerHTML = `
-    <section id="form">
-    <input type="text" id="input-names" placeholder="Digite nomes separados por vírgula">
-    <button id="add">Adicionar</button>
-    <button id="girar" class="start-button">Sortear</button>
-    <button id="reset">Resetar</button>
-    <p id="validation-message" style="display: none; color: red;">Por favor, insira ao menos um nome ou número.</p>
+    <header class="page-header">
+        <div class="nav-container">
+          <h1 class="nav-title">Sorteador Alpha</h1>
+          <nav class="page-nav">
+            <ul class="nav-list">
+              <li class="nav-item"><a href="#home" class="nav-link">Home</a></li>
+              <li class="nav-item"><a href="#about" class="nav-link">About</a></li>
+              <li class="nav-item"><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+          </nav>
+        </div>
+    </header>
+    <main>
+        <div class="page-container">
+            <div class="button-home">
+                <img width="24" height="24" src="https://img.icons8.com/material-rounded/96/back--v1.png" alt="Voltar"/>
+            </div>
+            <div class="wheel-container">
+                <canvas id="canvas" class="canva" width="500" height="500"></canvas>
+                <div class="pointer"></div>
+            </div>
 
-    <!-- Exibição do vencedor -->
-    <section id="result">
-    <h2>Vencedor:</h2>
-    <p id="resultado">Nenhum sorteio realizado ainda.</p>
-    </section>
-
-    <!-- Estrutura da roleta -->
-    <section id="roulette">
-    <div class="wheel-container">
-    <canvas id="canvas" width="500" height="500"></canvas>
-    <div class="pointer"></div>
-    </section>
-
-    <!-- Histórico (Opcional) -->
-    <section id="history">
-    <h2>Histórico de Sorteios</h2>
-    <ul id="history-list"></ul>
-    </section>
+            <div class="button-container">
+                <button class="page-button sortear" id="girar">Sortear</button>
+                <button class="page-button sortear" id="reset">Resetar</button>
+            </div>
+            <div class="container">
+                <p id="resultado">Clique no botão para sortear um nome</p>
+                <div class="winner-container">
+                    <div class="winner-header">
+                      <h2 class="winner-title">Historico</h2>
+                    </div>
+                    <div class="winner-box">
+                          <ol class="winner-name" id="history-list">
+                          </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer class="page-footer">
+        <p class="footer-text">@Alpha Edtech 2025</p>
+    </footer>
   `;
 
-  // Use div.querySelector ao invés de document.getElementById
-  const inputNames = div.querySelector("#input-names");
-  const addButton = div.querySelector("#add");
+  // Elementos do DOM
   const canvas = div.querySelector("#canvas");
   const ctx = canvas.getContext("2d");
-
+  const resultadoElement = div.querySelector("#resultado");
+  const buttonHome = div.querySelector(".button-home");
+  const historyList = div.querySelector("#history-list");
+  // Configurações do canvas
   const largura = canvas.width;
   const altura = canvas.height;
   const centroX = largura / 2;
   const centroY = altura / 2;
   const raio = largura / 2;
 
-
-
   let grausAtuais = 0;
 
+  // Recuperar nomes do localStorage
   let namesArray = JSON.parse(localStorage.getItem("names")) || [];
   let angulosItens = desenharRoleta(ctx, namesArray, largura, altura, centroX, centroY, raio);
 
-  addButton.addEventListener("click", function () {
-    const inputValue = inputNames.value.trim();
+  // Evento de girar a roleta
+  div.querySelector("#girar").addEventListener("click", async () => {
 
-    if (!inputValue) {
-      alert("Por favor, insira ao menos um nome ou número.");
-      return;
+    // Verifica se o array tem apenas um elemento
+    if (namesArray.length === 1) {
+      alert("Adicione mais nomes para sortear."); // Exibe um alerta
+      namesArray = []; // Limpa o array
+      localStorage.setItem("names", JSON.stringify(namesArray)); // Atualiza o localStorage
+      dispararEvento("/home"); // Dispara o evento para voltar à página
+      return; // Sai da função
     }
 
-    const separatedNames = inputValue.split(",").map(name => name.trim());
-
-    separatedNames.forEach(function (name) {
-      if (name) namesArray.push(name);
-    });
-
-    inputNames.value = "";
-    angulosItens = desenharRoleta(ctx, namesArray, largura, altura, centroX, centroY, raio);
-    console.log(namesArray);
-  });
-
-  // Use div.querySelector aqui também
-  div.querySelector("#girar").addEventListener("click", async () => {
     const nomeEscolhido = fisherYatesShuffle(namesArray);
     const { alvoRotacao } = girar(nomeEscolhido, angulosItens);
 
@@ -87,16 +96,49 @@ export function RoulettePage() {
     namesArray = namesArray.filter(nome => nome !== resultado.nomeEscolhido);
     localStorage.setItem("names", JSON.stringify(namesArray));
 
-    // Atualizar ângulos da roleta sem "teleporte"
+    // Atualizar ângulos da roleta
     angulosItens = desenharRoleta(ctx, namesArray, largura, altura, centroX, centroY, raio);
 
-    // Exibir resultado
-    div.querySelector("#resultado").innerText = `Nome sorteado: ${resultado.nomeEscolhido}`;
+    // Atualizar elementos na tela
+    resultadoElement.innerText = `Nome sorteado: ${resultado.nomeEscolhido}`;
+    saveHistory(resultado.nomeEscolhido)
   });
 
-  div.querySelector("#reset").addEventListener("click", function () {
+  // Evento de voltar para home (na setinha)
+  buttonHome.addEventListener("click", () => {
     dispararEvento("/home");
   });
 
+  div.querySelector("#reset").addEventListener("click", function () {
+    // Limpa o localStorage
+    localStorage.removeItem("names");
+    localStorage.removeItem("sorteioHistory");
+
+    // Limpa as variáveis
+    namesArray = [];
+
+    // Log de confirmação
+    alert("Dados resetados com sucesso");
+
+    // Opcional: Atualiza a interface se necessário
+    dispararEvento("/home");
+  });
+
+  function saveHistory(nome) {
+    let history = JSON.parse(localStorage.getItem("sorteioHistory")) || [];
+    history.push(nome);
+    localStorage.setItem("sorteioHistory", JSON.stringify(history));
+    renderHistory()
+  }
+  function renderHistory() {
+    historyList.innerHTML = "";
+    let history = JSON.parse(localStorage.getItem("sorteioHistory")) || [];
+    history.forEach(nome => {
+      const li = document.createElement("li");
+      li.textContent = nome;
+      historyList.appendChild(li);
+    });
+  }
+  renderHistory()
   return div;
 }

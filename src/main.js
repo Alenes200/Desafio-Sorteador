@@ -1,10 +1,5 @@
-import { paraRadianos, desenharRoleta, girar, animarRoleta } from './utils/roulette.js'
-import { fisherYatesShuffle } from './utils/draw.js';
 import { HomePage } from './pages/home-page.js';
 import { RoulettePage } from './pages/roulette-page.js';
-
-console.log("Estou na main.js")
-
 
 const root = document.getElementById('root');
 
