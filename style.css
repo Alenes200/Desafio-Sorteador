@@ -1,47 +1,383 @@
-        .wheel-container {
-          position: relative;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          margin-top: 50px;
-        }
+  .wheel-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+  }
 
-        .pointer {
-          width: 0;
-          height: 0;
-          border-left: 20px solid transparent;
-          border-right: 20px solid transparent;
-          border-top: 40px solid red;
-          position: absolute;
-          top: -20px;
-          left: 50%;
-          transform: translate(-50%, 0);
-        }
+  .pointer {
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 40px solid red;
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translate(-50%, 0);
+  }
 
-        .center-circle {
-          width: 80px;
-          height: 80px;
-          background-color: white;
-          border-radius: 50%;
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-        }
+  .center-circle {
+    width: 80px;
+    height: 80px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 
-        .button-container {
-          margin-top: 20px;
-          display: flex;
-          justify-content: center;
-        }
+  .button-container {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
 
-        #resultado {
-          margin-top: 20px;
-          font-size: 20px;
-        }
+  #resultado {
+    margin-top: 20px;
+    font-size: 20px;
+  }
 
-        .start-button {
-          padding: 10px 20px;
-          font-size: 16px;
-          cursor: pointer;
-        }
+  .start-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  /* CSS DA PAGINA */
+
+  .root * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background: #051e1f;
+  }
+
+  .container-main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #051e1f;
+    padding: 0;
+  }
+
+  .main-content {
+    background: #051e1f;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
+  }
+
+  .page-central {
+    background: #051e1f;
+    width: 100%;
+    max-width: 944px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .page-card-title {
+    background: #0b2925;
+    border-radius: 20px;
+    width: 680px;
+    height: 165px;
+    position: relative;
+    box-shadow: 20px 4px 4px 5px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .page-title {
+    color: #effaf2;
+    font-family: "Lobster Two", sans-serif;
+    font-size: 90px;
+    font-weight: 400;
+    position: absolute;
+    top: 0;
+    left: 20px;
+    width: calc(100% - 40px);
+    text-align: center;
+    margin: 0;
+  }
+
+  .page-text {
+    color: #ffffff;
+    text-align: center;
+    font-family: "Poppins-Regular", sans-serif;
+    font-size: 20px;
+    font-weight: 400;
+    width: 100%;
+    max-width: 867px;
+    margin-top: 30px;
+  }
+
+  .textarea-custom {
+    background: #062f29;
+    border-radius: 15px;
+    width: 100%;
+    max-width: 734px;
+    height: 114px;
+    border: none;
+    color: #fff;
+    padding: 10px;
+    font-size: 16px;
+    resize: none;
+    outline: none;
+    margin-top: 18px;
+  }
+
+  .page-name-label {
+    color: #ffffff;
+    text-align: center;
+    font-family: "Poppins-Regular", sans-serif;
+    font-size: 20px;
+    font-weight: 400;
+    margin-top: 20px;
+  }
+
+  .page-button.sortear {
+    color: #051e1f;
+    text-align: center;
+    font-family: "Poppins-Regular", sans-serif;
+    font-size: 24px;
+    font-weight: 400;
+    width: 162px;
+    height: 50px;
+    background-color: #9ae7d4;
+    border: 2px solid #051e1f;
+    border-radius: 15px;
+    cursor: pointer;
+    line-height: 30px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    transition: background-color 0.3s, transform 0.2s;
+    margin-top: 30px;
+  }
+
+  .page-button.sortear:hover {
+    background-color: #051e1f;
+    color: #67c4c7;
+    transform: scale(1.05);
+  }
+
+  .page-button.sortear:active {
+    transform: scale(0.95);
+  }
+
+
+  @media (max-width: 720px) {
+    .page-central {
+      padding: 10px;
+      gap: 35px;
+      transform: scale(0.8);
+      transform-origin: top;
+    }
+
+    .page-card-title {
+      width: 100%;
+      height: 60%;
+      box-shadow: 10px 2px 4px rgba(0, 0, 0, 0.25);
+      margin-bottom: 20px;
+    }
+
+    .page-title {
+      font-size: 65px;
+      width: 100%;
+      margin-top: 10px;
+      margin-bottom: 20px;
+    }
+
+    .page-text {
+      font-size: 16px;
+      margin-top: 15px;
+      width: 100%;
+    }
+
+    .textarea-custom {
+      max-width: 100%;
+      height: 150px;
+      font-size: 20px;
+      margin-top: 10px;
+    }
+
+    .page-name-label {
+      font-size: 16px;
+      margin-top: 10px;
+    }
+
+    .page-button.sortear {
+      font-size: 18px;
+      width: 120px;
+      height: 40px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .page-central {
+      padding: 8px;
+      transform: scale(0.7);
+      transform-origin: top;
+    }
+
+    .page-card-title {
+      width: 100%;
+      height: auto;
+      box-shadow: 8px 2px 4px rgba(0, 0, 0, 0.25);
+      margin-bottom: 15px;
+    }
+
+    .page-title {
+      font-size: 45px;
+      width: 100%;
+      margin-top: -5px;
+      margin-bottom: 15px;
+      left: 5px;
+      text-align: center;
+    }
+
+    .page-text {
+      font-size: 14px;
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    .textarea-custom {
+      max-width: 100%;
+      height: 70px;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .page-name-label {
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    .page-button.sortear {
+      font-size: 16px;
+      width: 100px;
+      height: 35px;
+    }
+  }
+
+  @media (max-width: 338px) {
+    .page-central {
+      padding: 8px;
+      transform: scale(0.7);
+      transform-origin: top;
+    }
+
+    .page-card-title {
+      width: 100%;
+      height: auto;
+      box-shadow: 8px 2px 4px rgba(0, 0, 0, 0.25);
+      margin-bottom: 15px;
+    }
+
+    .page-title {
+      font-size: 35px;
+      width: 100%;
+      margin-top: -5px;
+      margin-bottom: 15px;
+      left: 5px;
+      text-align: left;
+    }
+
+    .page-text {
+      margin-bottom: -20px;
+      font-size: 12px;
+      margin-top: 10px;
+      width: 100%;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      white-space: normal;
+      box-sizing: border-box;
+    }
+
+    .textarea-custom {
+      max-width: 100%;
+      height: 70px;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .page-name-label {
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    .page-button.sortear {
+      font-size: 16px;
+      width: 100px;
+      height: 35px;
+    }
+  }
+
+  @media (max-width: 300px) {
+    .page-central {
+      padding: 8px;
+      transform: scale(0.7);
+      transform-origin: top;
+    }
+
+    .page-card-title {
+      width: 100%;
+      height: auto;
+      box-shadow: 8px 2px 4px rgba(0, 0, 0, 0.25);
+      margin-bottom: 15px;
+    }
+
+    .page-title {
+      font-size: 30px;
+      width: 100%;
+      margin-top: -5px;
+      margin-bottom: 15px;
+      left: 5px;
+      text-align: left;
+    }
+
+    .page-text {
+      margin-bottom: -20px;
+      font-size: 10px;
+      margin-top: 10px;
+      width: 100%;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      white-space: normal;
+      box-sizing: border-box;
+    }
+
+    .textarea-custom {
+      max-width: 100%;
+      height: 70px;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .page-name-label {
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    .page-button.sortear {
+      font-size: 16px;
+      width: 100px;
+      height: 35px;
+    }
+  }

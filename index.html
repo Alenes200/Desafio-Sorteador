@@ -4,48 +4,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sorteador Online</title>
+  <title>Roleta Alpha</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Lobster&family=Lobster+Two:ital,wght@0,400;0,700;1,400;1,700&family=Playwrite+IE+Guides&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet">
 </head>
 
 <body>
-  <header>
-    <h1>Sorteador Online</h1>
-    <p>Insira os nomes ou números, e vamos sortear!</p>
-  </header>
-
-  <!-- Formulário de entrada -->
-  <section id="form">
-    <input type="text" id="input-names" placeholder="Digite nomes separados por vírgula">
-    <button id="add">Adicionar</button>
-    <button id="girar" class="start-button">Sortear</button>
-    <button id="reset">Resetar</button>
-    <p id="validation-message" style="display: none; color: red;">Por favor, insira ao menos um nome ou número.</p>
-
-    <!-- Área para exibir os nomes adicionados -->
-    <h3>Nomes Adicionados:</h3>
-    <ul id="added-names-list"></ul>
-  </section>
-
-  <!-- Exibição do vencedor -->
-  <section id="result">
-    <h2>Vencedor:</h2>
-    <p id="resultado">Nenhum sorteio realizado ainda.</p>
-  </section>
-
-  <!-- Estrutura da roleta -->
-  <section id="roulette">
-    <div class="wheel-container">
-      <canvas id="canvas" width="500" height="500"></canvas>
-      <div class="pointer"></div>
-  </section>
-
-  <!-- Histórico (Opcional) -->
-  <section id="history">
-    <h2>Histórico de Sorteios</h2>
-    <ul id="history-list"></ul>
-    <script src="main.js" type="module"></script>
-  </section>
+  <header></header>
+  <div id="root"></div>
+  <script src="main.js" type="module"></script>
 </body>
 
 </html>

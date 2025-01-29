@@ -44,7 +44,7 @@ export function girar(nomeEscolhido, angulosItens) {
 }
 
 export function animarRoleta(ctx, nomes, angulosItens, largura, altura, centroX, centroY, grausAtuais, alvoRotacao, nomeEscolhido) {
-  const duracaoAnimacao = 4000;
+  const duracaoAnimacao = 8000;
   const taxaQuadros = 60;
   const totalQuadros = (duracaoAnimacao / 1000) * taxaQuadros;
   let quadro = 0;
