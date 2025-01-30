@@ -29,7 +29,7 @@ export function HomePage() {
             Venha conferir!
           </div>
           <div class="page-name-label">Digite os nomes:</div>
-          <textarea class="textarea-custom" placeholder="Digite os nomes aqui..."></textarea>
+          <textarea class="textarea-custom" placeholder="Digite os nomes aqui... (adicione um por vez ou separados por vírgula)"></textarea>
           <div class="buttons-container">
             <button class="page-button adicionar">Adicionar</button>
             <button class="page-button roleta">Roleta</button>

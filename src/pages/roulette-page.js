@@ -1,6 +1,6 @@
 import { dispararEvento } from "../custom-event.js";
 import { paraRadianos, desenharRoleta, girar, animarRoleta } from '../utils/roulette.js'
-import { fisherYatesShuffle } from '../utils/draw.js';
+import { sortearNomeAPI } from '../utils/api-draw.js';
 
 export function RoulettePage() {
   const div = document.createElement('div');
@@ -66,42 +66,68 @@ export function RoulettePage() {
 
   let grausAtuais = 0;
 
+  let nomesParaRemover = []; // Array temporário para armazenar nomes que devem ser removidos
+
   // Recuperar nomes do localStorage
   let namesArray = JSON.parse(localStorage.getItem("names")) || [];
   let angulosItens = desenharRoleta(ctx, namesArray, largura, altura, centroX, centroY, raio);
 
   // Evento de girar a roleta
   div.querySelector("#girar").addEventListener("click", async () => {
+    const botaoGirar = div.querySelector("#girar"); // Seleciona o botão
 
-    // Verifica se o array tem apenas um elemento
-    if (namesArray.length === 1) {
-      alert("Adicione mais nomes para sortear."); // Exibe um alerta
-      namesArray = []; // Limpa o array
-      localStorage.setItem("names", JSON.stringify(namesArray)); // Atualiza o localStorage
-      dispararEvento("/home"); // Dispara o evento para voltar à página
-      return; // Sai da função
+    // Desabilita o botão
+    botaoGirar.disabled = true;
+    botaoGirar.textContent = "Girando..."; // Opcional: muda o texto do botão
+
+    try {
+      // Verifica se o array tem apenas um elemento
+      if (namesArray.length === 1) {
+        alert("Adicione mais nomes para sortear.");
+        namesArray = [];
+        localStorage.setItem("names", JSON.stringify(namesArray));
+        dispararEvento("/home");
+        return;
+      }
+
+      // Redesenha a roleta antes de girar (remove os nomes marcados)
+      if (nomesParaRemover.length > 0) {
+        namesArray = namesArray.filter(nome => !nomesParaRemover.includes(nome));
+        localStorage.setItem("names", JSON.stringify(namesArray));
+        angulosItens = desenharRoleta(ctx, namesArray, largura, altura, centroX, centroY, raio);
+        nomesParaRemover = []; // Limpa o array temporário
+      }
+
+      // Chama a API para sortear um nome
+      const nomeEscolhido = await sortearNomeAPI(namesArray);
+
+      if (!nomeEscolhido) {
+        return; // Se houver erro, interrompe a execução
+      }
+
+      const { alvoRotacao } = girar(nomeEscolhido, angulosItens);
+
+      const resultado = await animarRoleta(
+        ctx, namesArray, angulosItens, largura, altura, centroX, centroY,
+        grausAtuais, alvoRotacao, nomeEscolhido
+      );
+
+      grausAtuais = resultado.novoGrausAtuais;
+
+      // Marca o nome sorteado para remoção (não remove ainda)
+      nomesParaRemover.push(resultado.nomeEscolhido);
+
+      // Atualiza elementos na tela
+      resultadoElement.innerText = `Nome sorteado: ${resultado.nomeEscolhido}`;
+      saveHistory(resultado.nomeEscolhido);
+    } catch (error) {
+      console.error("Erro durante o sorteio:", error);
+      alert("Ocorreu um erro durante o sorteio. Tente novamente.");
+    } finally {
+      // Reabilita o botão, independentemente de sucesso ou erro
+      botaoGirar.disabled = false;
+      botaoGirar.textContent = "Girar"; // Restaura o texto original
     }
-
-    const nomeEscolhido = fisherYatesShuffle(namesArray);
-    const { alvoRotacao } = girar(nomeEscolhido, angulosItens);
-
-    const resultado = await animarRoleta(
-      ctx, namesArray, angulosItens, largura, altura, centroX, centroY,
-      grausAtuais, alvoRotacao, nomeEscolhido
-    );
-
-    grausAtuais = resultado.novoGrausAtuais;
-
-    // Remover nome sorteado da lista e salvar no localStorage
-    namesArray = namesArray.filter(nome => nome !== resultado.nomeEscolhido);
-    localStorage.setItem("names", JSON.stringify(namesArray));
-
-    // Atualizar ângulos da roleta
-    angulosItens = desenharRoleta(ctx, namesArray, largura, altura, centroX, centroY, raio);
-
-    // Atualizar elementos na tela
-    resultadoElement.innerText = `Nome sorteado: ${resultado.nomeEscolhido}`;
-    saveHistory(resultado.nomeEscolhido)
   });
 
   // Evento de voltar para home (na setinha)
@@ -139,6 +165,7 @@ export function RoulettePage() {
       historyList.appendChild(li);
     });
   }
+
   renderHistory()
   return div;
 }
