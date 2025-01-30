@@ -44,6 +44,13 @@ export function RoulettePage() {
                     </div>
                 </div>
             </div>
+          <div id="divModal" class="modal" style="display: none;">
+            <div class="modal-content">
+              <span class="close">❌</span>
+              <h2>🎉 Campeão 🎉</h2>
+              <p id="nameChampion"></p>
+            </div>
+          </div>
         </div>
     </main>
     <footer class="page-footer">
@@ -52,6 +59,10 @@ export function RoulettePage() {
   `;
 
   // Elementos do DOM principais
+  const modal = div.querySelector("#divModal");
+  const nameChampion = div.querySelector("#nameChampion");
+  const spanClose = div.querySelector(".close");
+
   const canvas = div.querySelector("#canvas");
   const ctx = canvas.getContext("2d");
   const resultText = div.querySelector("#resultado");
@@ -115,6 +126,7 @@ export function RoulettePage() {
       // Atualização da interface com resultado
       resultText.innerText = `Nome sorteado: ${result.selectedName}`;
       saveHistory(result.selectedName);
+      openModal(resultado.nomeEscolhido); // Abre o modal com o nome do campeão
 
     } catch (error) {
       console.error("Erro durante o sorteio:", error);
@@ -156,6 +168,25 @@ export function RoulettePage() {
       historyList.appendChild(li);
     });
   }
+
+    // Função para abrir o modal
+    function openModal(nome) {
+      nameChampion.innerText = nome;
+      modal.style.display = "block";
+    }
+  
+    // Fecha o modal ao clicar no botão de fechar
+    spanClose.addEventListener("click", (event) => {
+      event.stopPropagation(); // Impede a propagação do evento
+      modal.style.display = "none";
+    });
+  
+    // Fecha o modal ao clicar fora dele
+    window.addEventListener("click", (event) => {
+      if (event.target === modal) {
+        modal.style.display = "none";
+      }
+    });
 
   // Renderização inicial do histórico
   renderHistory()
