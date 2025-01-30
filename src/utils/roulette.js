@@ -1,78 +1,84 @@
-export function paraRadianos(graus) {
-  return graus * (Math.PI / 180);
+// Função utilitária para converter graus em radianos
+export function toRadians(degrees) {
+  return degrees * (Math.PI / 180);
 }
 
-export function desenharRoleta(ctx, nomes, largura, altura, centroX, centroY, raio) {
-  const passo = 360 / nomes.length;
-  const angulosItens = {};
-  let anguloInicial = 0;
+// Função principal para desenhar a roda da roleta com setores e texto
+export function drawRouletteWheel(ctx, names, width, height, centerX, centerY, radius) {
+  const step = 360 / names.length;
+  const sectorAngles = {};
+  let startAngle = 0;
 
-  nomes.forEach((nome, index) => {
-    const anguloFinal = anguloInicial + passo;
-    const cor = `hsl(${index * (360 / nomes.length)}, 80%, 60%)`;
+  names.forEach((name, index) => {
+    const endAngle = startAngle + step;
+    const color = `hsl(${index * (360 / names.length)}, 80%, 60%)`;
 
+    // Desenha o setor
     ctx.beginPath();
-    ctx.moveTo(centroX, centroY);
-    ctx.arc(centroX, centroY, raio, paraRadianos(anguloInicial), paraRadianos(anguloFinal));
-    ctx.fillStyle = cor;
+    ctx.moveTo(centerX, centerY);
+    ctx.arc(centerX, centerY, radius, toRadians(startAngle), toRadians(endAngle));
+    ctx.fillStyle = color;
     ctx.fill();
 
+    // Desenha o texto do rótulo
     ctx.save();
-    ctx.translate(centroX, centroY);
-    ctx.rotate(paraRadianos((anguloInicial + anguloFinal) / 2));
+    ctx.translate(centerX, centerY);
+    ctx.rotate(toRadians((startAngle + endAngle) / 2));
     ctx.textAlign = "right";
     ctx.fillStyle = "#fff";
     ctx.font = "16px Arial";
-    ctx.fillText(nome, raio - 20, 10);
+    ctx.fillText(name, radius - 20, 10);
     ctx.restore();
 
-    angulosItens[nome] = { inicio: anguloInicial, fim: anguloFinal };
-    anguloInicial = anguloFinal;
+    sectorAngles[name] = { start: startAngle, end: endAngle };
+    startAngle = endAngle;
   });
 
-  return angulosItens;
+  return sectorAngles;
 }
 
-export function girar(nomeEscolhido, angulosItens) {
-  const meioSetor = (angulosItens[nomeEscolhido].inicio + angulosItens[nomeEscolhido].fim) / 2;
+// Calcula o alvo de rotação para o nome selecionado
+export function spin(selectedName, sectorAngles) {
+  const sectorMiddle = (sectorAngles[selectedName].start + sectorAngles[selectedName].end) / 2;
+  const fullRotations = 360 * 5;
+  const offset = -90;
+  const rotationTarget = fullRotations + offset - sectorMiddle;
 
-  const voltasCompletas = 360 * 5;
-  const deslocamento = -90;
-  const alvoRotacao = voltasCompletas + deslocamento - meioSetor;
-
-  return { nomeEscolhido, alvoRotacao };
+  return { selectedName, rotationTarget };
 }
 
-export function animarRoleta(ctx, nomes, angulosItens, largura, altura, centroX, centroY, grausAtuais, alvoRotacao, nomeEscolhido) {
-  const duracaoAnimacao = 8000;
-  const taxaQuadros = 60;
-  const totalQuadros = (duracaoAnimacao / 1000) * taxaQuadros;
-  let quadro = 0;
-  const grausIniciais = grausAtuais;
+// Anima a rotação da roda com suavização
+export function animateWheel(ctx, names, sectorAngles, width, height, centerX, centerY, currentDegrees, rotationTarget, selectedName) {
+  const animationDuration = 8000;
+  const frameRate = 60;
+  const totalFrames = (animationDuration / 1000) * frameRate;
+  let frame = 0;
+  const startDegrees = currentDegrees;
 
   return new Promise((resolve) => {
-    function animar() {
-      quadro++;
-      const progresso = Math.min(quadro / totalQuadros, 1);
-      const progressoSuavizado = Math.sin((progresso * Math.PI) / 2);
-      const rotacaoAtual = grausIniciais + (alvoRotacao - grausIniciais) * progressoSuavizado;
+    function animate() {
+      frame++;
+      const progress = Math.min(frame / totalFrames, 1);
+      const easedProgress = Math.sin((progress * Math.PI) / 2);
+      const currentRotation = startDegrees + (rotationTarget - startDegrees) * easedProgress;
 
-      ctx.clearRect(0, 0, largura, altura);
+      // Limpa e redesenha a roda com a nova rotação
+      ctx.clearRect(0, 0, width, height);
       ctx.save();
-      ctx.translate(centroX, centroY);
-      ctx.rotate(paraRadianos(rotacaoAtual));
-      ctx.translate(-centroX, -centroY);
-      desenharRoleta(ctx, nomes, largura, altura, centroX, centroY, largura / 2);
+      ctx.translate(centerX, centerY);
+      ctx.rotate(toRadians(currentRotation));
+      ctx.translate(-centerX, -centerY);
+      drawRouletteWheel(ctx, names, width, height, centerX, centerY, width / 2);
       ctx.restore();
 
-      if (quadro < totalQuadros) {
-        requestAnimationFrame(animar);
+      if (frame < totalFrames) {
+        requestAnimationFrame(animate);
       } else {
-        const novoGrausAtuais = alvoRotacao % 360;
-        resolve({ novoGrausAtuais, nomeEscolhido });
+        const newCurrentDegrees = rotationTarget % 360;
+        resolve({ newCurrentDegrees, selectedName });
       }
     }
 
-    animar();
+    animate();
   });
 }

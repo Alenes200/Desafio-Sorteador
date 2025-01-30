@@ -1,5 +1,5 @@
-export function dispararEvento(rota) {
-
-  const evento = new CustomEvent("navegacao", { detail: rota });
-  document.dispatchEvent(evento);
+// Dispara evento customizado para navegação entre rotas
+export function triggerEvent(route) {
+  const event = new CustomEvent("navigation", { detail: route });
+  document.dispatchEvent(event);
 }

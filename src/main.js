@@ -1,28 +1,25 @@
 import { HomePage } from './pages/home-page.js';
 import { RoulettePage } from './pages/roulette-page.js';
 
+// Elemento raiz da aplicação
 const root = document.getElementById('root');
-
 root.appendChild(HomePage());
 
-export const rotas = {
+// Configuração e gerenciamento das rotas
+export const routes = {
   "/home": HomePage,
   "/roulette": RoulettePage,
 
-  navegar(rota) {
-    window.history.pushState(null, null, rota);
-
+  navigate(route) {
+    window.history.pushState(null, null, route);
     root.innerHTML = "";
-
-    const funcaoDaPagina = this[rota];
-
-    root.appendChild(funcaoDaPagina());
-
+    const pageFunction = this[route];
+    root.appendChild(pageFunction());
   },
 };
 
-document.addEventListener("navegacao", function (event) {
-  const rota = event.detail;
-  rotas.navegar(rota);
+// Listener para eventos de navegação
+document.addEventListener("navigation", function (event) {
+  const route = event.detail;
+  routes.navigate(route);
 })
-

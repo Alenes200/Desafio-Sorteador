@@ -1,6 +1,6 @@
-import { dispararEvento } from "../custom-event.js";
-import { paraRadianos, desenharRoleta, girar, animarRoleta } from '../utils/roulette.js'
-import { sortearNomeAPI } from '../utils/api-draw.js';
+import { triggerEvent } from "../custom-event.js";
+import { toRadians, drawRouletteWheel, spin, animateWheel } from '../utils/roulette.js'
+import { drawNameAPI } from '../utils/api-draw.js';
 
 export function RoulettePage() {
   const div = document.createElement('div');
@@ -11,9 +11,9 @@ export function RoulettePage() {
           <h1 class="nav-title">Sorteador Alpha</h1>
           <nav class="page-nav">
             <ul class="nav-list">
-              <li class="nav-item"><a href="#home" class="nav-link">Home</a></li>
-              <li class="nav-item"><a href="#about" class="nav-link">About</a></li>
-              <li class="nav-item"><a href="#contact" class="nav-link">Contact</a></li>
+              <li class="nav-item"><a href="#home" class="nav-link">Inicio</a></li>
+              <li class="nav-item"><a href="#about" class="nav-link">Somos</a></li>
+              <li class="nav-item"><a href="#contact" class="nav-link">Contato</a></li>
             </ul>
           </nav>
         </div>
@@ -51,121 +51,113 @@ export function RoulettePage() {
     </footer>
   `;
 
-  // Elementos do DOM
+  // Elementos do DOM principais
   const canvas = div.querySelector("#canvas");
   const ctx = canvas.getContext("2d");
-  const resultadoElement = div.querySelector("#resultado");
+  const resultText = div.querySelector("#resultado");
   const buttonHome = div.querySelector(".button-home");
   const historyList = div.querySelector("#history-list");
-  // Configurações do canvas
-  const largura = canvas.width;
-  const altura = canvas.height;
-  const centroX = largura / 2;
-  const centroY = altura / 2;
-  const raio = largura / 2;
 
-  let grausAtuais = 0;
+  // Configurações e dimensões do canvas
+  const width = canvas.width;
+  const height = canvas.height;
+  const centerX = width / 2;
+  const centerY = height / 2;
+  const radius = width / 2;
 
-  let nomesParaRemover = []; // Array temporário para armazenar nomes que devem ser removidos
+  let currentDegrees = 0;
 
-  // Recuperar nomes do localStorage
+  // Array para controle de nomes que serão removidos após o sorteio
+  let namesToRemove = [];
+
+  // Inicialização: recupera nomes do localStorage
   let namesArray = JSON.parse(localStorage.getItem("names")) || [];
-  let angulosItens = desenharRoleta(ctx, namesArray, largura, altura, centroX, centroY, raio);
+  let sectorAngles = drawRouletteWheel(ctx, namesArray, width, height, centerX, centerY, radius);
 
-  // Evento de girar a roleta
+  // Handler principal do sorteio
   div.querySelector("#girar").addEventListener("click", async () => {
-    const botaoGirar = div.querySelector("#girar"); // Seleciona o botão
-
-    // Desabilita o botão
-    botaoGirar.disabled = true;
-    botaoGirar.textContent = "Girando..."; // Opcional: muda o texto do botão
+    const spinButton = div.querySelector("#girar");
+    spinButton.disabled = true;
+    spinButton.textContent = "Girando...";
 
     try {
-      // Verifica se o array tem apenas um elemento
+      // Validação de quantidade mínima de nomes
       if (namesArray.length === 1) {
         alert("Adicione mais nomes para sortear.");
         namesArray = [];
         localStorage.setItem("names", JSON.stringify(namesArray));
-        dispararEvento("/home");
+        triggerEvent("/home");
         return;
       }
 
-      // Redesenha a roleta antes de girar (remove os nomes marcados)
-      if (nomesParaRemover.length > 0) {
-        namesArray = namesArray.filter(nome => !nomesParaRemover.includes(nome));
+      // Atualização da roleta removendo nomes já sorteados
+      if (namesToRemove.length > 0) {
+        namesArray = namesArray.filter(name => !namesToRemove.includes(name));
         localStorage.setItem("names", JSON.stringify(namesArray));
-        angulosItens = desenharRoleta(ctx, namesArray, largura, altura, centroX, centroY, raio);
-        nomesParaRemover = []; // Limpa o array temporário
+        sectorAngles = drawRouletteWheel(ctx, namesArray, width, height, centerX, centerY, radius);
+        namesToRemove = [];
       }
 
-      // Chama a API para sortear um nome
-      const nomeEscolhido = await sortearNomeAPI(namesArray);
+      // Processo de sorteio e animação
+      const selectedName = await drawNameAPI(namesArray);
+      if (!selectedName) return;
 
-      if (!nomeEscolhido) {
-        return; // Se houver erro, interrompe a execução
-      }
+      const { rotationTarget } = spin(selectedName, sectorAngles);
 
-      const { alvoRotacao } = girar(nomeEscolhido, angulosItens);
-
-      const resultado = await animarRoleta(
-        ctx, namesArray, angulosItens, largura, altura, centroX, centroY,
-        grausAtuais, alvoRotacao, nomeEscolhido
+      const result = await animateWheel(
+        ctx, namesArray, sectorAngles, width, height, centerX, centerY,
+        currentDegrees, rotationTarget, selectedName
       );
 
-      grausAtuais = resultado.novoGrausAtuais;
+      currentDegrees = result.newCurrentDegrees;
+      namesToRemove.push(result.selectedName);
 
-      // Marca o nome sorteado para remoção (não remove ainda)
-      nomesParaRemover.push(resultado.nomeEscolhido);
+      // Atualização da interface com resultado
+      resultText.innerText = `Nome sorteado: ${result.selectedName}`;
+      saveHistory(result.selectedName);
 
-      // Atualiza elementos na tela
-      resultadoElement.innerText = `Nome sorteado: ${resultado.nomeEscolhido}`;
-      saveHistory(resultado.nomeEscolhido);
     } catch (error) {
       console.error("Erro durante o sorteio:", error);
       alert("Ocorreu um erro durante o sorteio. Tente novamente.");
     } finally {
-      // Reabilita o botão, independentemente de sucesso ou erro
-      botaoGirar.disabled = false;
-      botaoGirar.textContent = "Girar"; // Restaura o texto original
+      spinButton.disabled = false;
+      spinButton.textContent = "Girar";
     }
   });
 
-  // Evento de voltar para home (na setinha)
+  // Eventos auxiliares
   buttonHome.addEventListener("click", () => {
-    dispararEvento("/home");
+    triggerEvent("/home");
   });
 
+  // Apagar todos os dados
   div.querySelector("#reset").addEventListener("click", function () {
-    // Limpa o localStorage
     localStorage.removeItem("names");
     localStorage.removeItem("sorteioHistory");
-
-    // Limpa as variáveis
     namesArray = [];
-
-    // Log de confirmação
-    alert("Dados resetados com sucesso");
-
-    // Opcional: Atualiza a interface se necessário
-    dispararEvento("/home");
+    alert("Dados deletados com sucesso");
+    triggerEvent("/home");
   });
 
-  function saveHistory(nome) {
+  // Funções de gerenciamento do histórico
+  function saveHistory(name) {
     let history = JSON.parse(localStorage.getItem("sorteioHistory")) || [];
-    history.push(nome);
+    history.push(name);
     localStorage.setItem("sorteioHistory", JSON.stringify(history));
     renderHistory()
   }
+
   function renderHistory() {
     historyList.innerHTML = "";
     let history = JSON.parse(localStorage.getItem("sorteioHistory")) || [];
-    history.forEach(nome => {
+    history.forEach(name => {
       const li = document.createElement("li");
-      li.textContent = nome;
+      li.textContent = name;
       historyList.appendChild(li);
     });
   }
 
+  // Renderização inicial do histórico
   renderHistory()
   return div;
 }
