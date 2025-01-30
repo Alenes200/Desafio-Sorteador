@@ -267,8 +267,20 @@ body {
   width: 100%;
   height: 100%;
   display: flex;
+  flex-direction: column-reverse; /* Faz os novos itens aparecerem no topo */
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start; /* Alinha os itens no topo */
+  text-align: center;
+  overflow-y: auto; /* Ativa a rolagem vertical */
+  margin-top: 10px;
+}
+/* Estilo básico para a barra de rolagem */
+::-webkit-scrollbar {
+  width: 8px; 
+}
+::-webkit-scrollbar-thumb {
+  background-color: #5f836c; 
+  border-radius: 4px; /
 }
 
 .winner-name {
@@ -562,4 +574,41 @@ body {
 
 #resultado {
   color: #effaf2;
+}
+
+.container {
+  text-align: center;
+  color: #9ae7d4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.button-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+.button-home {
+  width: 46px;
+  height: 46px;
+  position: relative;
+  overflow: visible;
+}
+
+.button-home {
+  background: #7bbbab;
+  border-radius: 20px;
+  height: 25px;
+  width: 100px;
+  position: relative;
+  top: 10px;
+  text-align: center;
+  cursor: pointer;
+}
+.button-home:hover {
+  background-color: #0c3f41;
+  color: #67c4c7;
+  transform: scale(1.05);
 }
