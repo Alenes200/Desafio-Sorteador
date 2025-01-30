@@ -109,24 +109,37 @@ export function RoulettePage() {
         namesToRemove = [];
       }
 
-      // Processo de sorteio e animação
+      // Inicia a animação imediatamente (rotação inicial)
+      const initialRotation = 360 * 5; // 5 voltas completas
+      let animationPromise = animateWheel(
+        ctx, namesArray, sectorAngles, width, height, centerX, centerY,
+        currentDegrees, initialRotation, null // Sem nome escolhido ainda
+      );
+
+      // Chama a API para sortear um nome
       const selectedName = await drawNameAPI(namesArray);
       if (!selectedName) return;
 
+      // Calcula o ângulo de parada com base no nome sorteado
       const { rotationTarget } = spin(selectedName, sectorAngles);
 
-      const result = await animateWheel(
+      // Atualiza o destino da animação
+      animationPromise = animateWheel(
         ctx, namesArray, sectorAngles, width, height, centerX, centerY,
         currentDegrees, rotationTarget, selectedName
       );
 
-      currentDegrees = result.newCurrentDegrees;
-      namesToRemove.push(result.selectedName);
+      // Aguarda o término da animação
+      const finalResult = await animationPromise;
+
+      // Atualiza os graus atuais e marca o nome para remoção
+      currentDegrees = finalResult.newCurrentDegrees;
+      namesToRemove.push(finalResult.selectedName);
 
       // Atualização da interface com resultado
-      resultText.innerText = `Nome sorteado: ${result.selectedName}`;
-      saveHistory(result.selectedName);
-      openModal(resultado.nomeEscolhido); // Abre o modal com o nome do campeão
+      resultText.innerText = `Nome sorteado: ${finalResult.selectedName}`;
+      saveHistory(finalResult.selectedName);
+      openModal(finalResult.selectedName);
 
     } catch (error) {
       console.error("Erro durante o sorteio:", error);
@@ -169,24 +182,24 @@ export function RoulettePage() {
     });
   }
 
-    // Função para abrir o modal
-    function openModal(nome) {
-      nameChampion.innerText = nome;
-      modal.style.display = "block";
-    }
-  
-    // Fecha o modal ao clicar no botão de fechar
-    spanClose.addEventListener("click", (event) => {
-      event.stopPropagation(); // Impede a propagação do evento
+  // Função para abrir o modal
+  function openModal(nome) {
+    nameChampion.innerText = nome;
+    modal.style.display = "block";
+  }
+
+  // Fecha o modal ao clicar no botão de fechar
+  spanClose.addEventListener("click", (event) => {
+    event.stopPropagation(); // Impede a propagação do evento
+    modal.style.display = "none";
+  });
+
+  // Fecha o modal ao clicar fora dele
+  window.addEventListener("click", (event) => {
+    if (event.target === modal) {
       modal.style.display = "none";
-    });
-  
-    // Fecha o modal ao clicar fora dele
-    window.addEventListener("click", (event) => {
-      if (event.target === modal) {
-        modal.style.display = "none";
-      }
-    });
+    }
+  });
 
   // Renderização inicial do histórico
   renderHistory()
