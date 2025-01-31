@@ -32,9 +32,9 @@ export function HomePage() {
           <textarea class="textarea-custom" placeholder="Digite os nomes aqui... (adicione um por vez ou separados por vírgula)"></textarea>
           <div class="buttons-container">
             <button class="page-button add">Adicionar</button>
-            <button class="page-button roulette">Roleta</button>
           </div>
           <p class="names-list" id="list"></p>
+           <button class="page-button roulette">Ir para Roleta</button>
         </div>
       </div>
     </div>

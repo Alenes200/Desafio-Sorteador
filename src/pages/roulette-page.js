@@ -23,6 +23,9 @@ export function RoulettePage() {
             <div class="button-home">
                 <img width="24" height="24" src="https://img.icons8.com/material-rounded/96/back--v1.png" alt="Voltar"/>
             </div>
+            <button class="button-clear" id="reset">
+            <img width="20" height="20" src="https://img.icons8.com/material-rounded/96/delete-forever.png" alt="Limpar"/>
+  Limpar</button>
             <div class="wheel-container">
                 <canvas id="canvas" class="canva" width="500" height="500"></canvas>
                 <div class="pointer"></div>
@@ -30,7 +33,6 @@ export function RoulettePage() {
 
             <div class="button-container">
                 <button class="page-button sortear" id="girar">Sortear</button>
-                <button class="page-button sortear" id="reset">Resetar</button>
             </div>
             <div class="container">
                 <p id="resultado">Clique no botão para sortear um nome</p>
@@ -47,7 +49,7 @@ export function RoulettePage() {
           <div id="divModal" class="modal" style="display: none;">
             <div class="modal-content">
               <span class="close">❌</span>
-              <h2>🎉 Campeão 🎉</h2>
+              <h2>🎉 Parabéns ganhador: 🎉</h2>
               <p id="nameChampion"></p>
             </div>
           </div>
@@ -79,10 +81,9 @@ export function RoulettePage() {
   let currentDegrees = 0;
 
   // Array para controle de nomes que serão removidos após o sorteio
-  let namesToRemove = [];
 
-  // Inicialização: recupera nomes do localStorage
   let namesArray = JSON.parse(localStorage.getItem("names")) || [];
+  let namesToRemove = JSON.parse(localStorage.getItem("namesToRemove")) || []; // Recupera namesToRemove
   let sectorAngles = drawRouletteWheel(ctx, namesArray, width, height, centerX, centerY, radius);
 
   // Handler principal do sorteio
@@ -106,7 +107,8 @@ export function RoulettePage() {
         namesArray = namesArray.filter(name => !namesToRemove.includes(name));
         localStorage.setItem("names", JSON.stringify(namesArray));
         sectorAngles = drawRouletteWheel(ctx, namesArray, width, height, centerX, centerY, radius);
-        namesToRemove = [];
+        namesToRemove = []; // Limpa o array temporário
+        localStorage.setItem("namesToRemove", JSON.stringify(namesToRemove)); // Atualiza o localStorage
       }
 
       // Inicia a animação imediatamente (rotação inicial)
@@ -135,6 +137,7 @@ export function RoulettePage() {
       // Atualiza os graus atuais e marca o nome para remoção
       currentDegrees = finalResult.newCurrentDegrees;
       namesToRemove.push(finalResult.selectedName);
+      localStorage.setItem("namesToRemove", JSON.stringify(namesToRemove)); // Salva no localStorage
 
       // Atualização da interface com resultado
       resultText.innerText = `Nome sorteado: ${finalResult.selectedName}`;
@@ -159,7 +162,9 @@ export function RoulettePage() {
   div.querySelector("#reset").addEventListener("click", function () {
     localStorage.removeItem("names");
     localStorage.removeItem("sorteioHistory");
+    localStorage.removeItem("namesToRemove");
     namesArray = [];
+    namesToRemove = [];
     alert("Dados deletados com sucesso");
     triggerEvent("/home");
   });
