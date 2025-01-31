@@ -1,6 +1,6 @@
 /* Reset e configurações globais */
 .root *,
-*root {
+* {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
