@@ -21,7 +21,7 @@ export function RoulettePage() {
     <main>
         <div class="page-container">
             <div class="button-home">
-                <img width="24" height="24" src="https://img.icons8.com/material-rounded/96/back--v1.png" alt="Voltar"/>
+                <img width="24" height="24" src="https://img.icons8.com/material-rounded/96/back--v1.png" alt="Voltar"/> Voltar
             </div>
             <button class="button-clear" id="reset">
             <img width="20" height="20" src="https://img.icons8.com/material-rounded/96/delete-forever.png" alt="Limpar"/>
