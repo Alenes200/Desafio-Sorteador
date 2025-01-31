@@ -6,7 +6,9 @@ A aplicação permite aos usuários adicionar nomes a uma lista e, em seguida, s
 
 ## Tela inicial
 
-![tela1](https://github.com/user-attachments/assets/f9380651-f79a-4268-8fd3-1a89a4b63be0)
+![WhatsApp Image 2025-01-31 at 16 22 30](https://github.com/user-attachments/assets/f43ba8b5-002e-4654-920a-a2f41f606230)
+
+🔗 Acesse o projeto: [Clique aqui](https://alenes200.github.io/Desafio-Sorteador/)
 
 ## Funcionalidades
 
@@ -35,18 +37,25 @@ A aplicação permite aos usuários adicionar nomes a uma lista e, em seguida, s
    - Na primeira página, insira os nomes no campo de texto e clique no botão "Adicionar" para incluí-los na lista.
    - Repita o processo para adicionar quantos nomes desejar.
      
-       ![telaadicionarnomes](https://github.com/user-attachments/assets/c51f2152-c6ea-4bc3-a29c-5c5f75fd0494)
+      ![Capturar](https://github.com/user-attachments/assets/3f39d9df-dea8-4bfa-89a1-9eaabc5c20cc)
 
 2. **Sortear Nomes**:
    - Após adicionar os nomes, clique no botão "Ir para Roleta" para ser redirecionado à página da roleta.
    - Na página da roleta, clique no botão "Sortear" para girar a roleta e selecionar um nome aleatório. A roleta utiliza a API hospedada no Vercel para garantir um sorteio justo.
      
-        ![sortear](https://github.com/user-attachments/assets/8cec1e92-a622-49db-b220-0212ed46115d)
+       ![roletanova1](https://github.com/user-attachments/assets/7cb290b5-9221-44a9-8961-73da99200562)
 
 3. **Visualizar Resultado**:
    - O nome sorteado será destacado na roleta, e o histórico será atualizado.
      
-        ![historico](https://github.com/user-attachments/assets/0ba8a062-292c-4130-b472-45f2b8a5505b)
+        ![historico1](https://github.com/user-attachments/assets/33c5b9ef-f7af-4947-9615-b7a79ccf732f)
+
+4. **Apagar e Adicionar Nomes**:
+   - Botão voltar para adicionar mais nomes na roleta.
+   - Botão limpar para resetar toda roleta e inserir novos nomes.
+     
+      ![apagharnovo](https://github.com/user-attachments/assets/778b3175-20df-4a6b-bfbc-2a4c54221ea4)
+
 
 ## Como Funciona a API?
 
